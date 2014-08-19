@@ -2,3 +2,4 @@
 .pydevproject
 *.npz
 *.csv
+oldScriptCid.py
