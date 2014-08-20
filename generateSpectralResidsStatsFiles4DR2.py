@@ -1,16 +1,7 @@
 #!/usr/bin/python
 import numpy as np
 from pycasso import fitsQ3DataCube
-import sys
-import matplotlib as mpl
-from matplotlib import pyplot as plt
-import os
 from pystarlight.util.constants import c
-
-mpl.rcParams['font.size'] = 16
-mpl.rcParams['axes.labelsize'] = 22
-mpl.rcParams['axes.titlesize'] = 26
-mpl.rcParams['font.family'] = 'sans-serif'
 
 debug = False
 #debug = True
@@ -35,29 +26,6 @@ if debug:
     
 N_gals = len(listOfPrefixes)
 
-def v0RestFrame(K, f_interp, l_rf):
-    c = 299792.5  # km/s
-
-    # Rest-frame spectra
-    O_rf__lz = np.zeros((K.Nl_obs, K.N_zone))
-    M_rf__lz = np.zeros((K.Nl_obs, K.N_zone))
-
-    if not l_rf:
-        l_rf = K.l_obs
-        
-    # Rest-frame wavelength
-    l_rf__lz = (l_rf * np.ones((K.N_zone, K.Nl_obs))).T
-
-    # linear-interpolating new l_obs fluxes
-    # from this point afterward in the code one can use O_RF and M_RF with K.l_obs instead K.f_obs and K.f_syn.
-    for z in range(K.N_zone):
-        O_rf__lz[:, z] = f_interp(K.l_obs, l_rf__lz[:, z], K.f_obs[:, z])
-        M_rf__lz[:, z] = f_interp(K.l_obs, l_rf__lz[:, z], K.f_syn[:, z])
-
-    rf_norm__z = np.median(O_rf__lz[~((K.l_obs < 5590) | (K.l_obs > 5680)), :], axis = 0)
-
-    return O_rf__lz, M_rf__lz, rf_norm__z
-
 #EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 #EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 #EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
@@ -72,6 +40,7 @@ if __name__ == '__main__':
     N_pixels = 0
     
     excludeWei0Code = 'w1'
+    
     if excludeWei0:
         excludeWei0Code = 'w0'
 
@@ -131,15 +100,15 @@ if __name__ == '__main__':
             K = fitsQ3DataCube(CALIFAFitsFile)
     
             # Setup is* 1/0 flags to select (zone,lambda) pixels which are Ok in different senses; isOk__lz wraps them all together
-            isFlagOk__lz = np.where(K.f_flag == 0, True, False)
-            isErrOk__lz = np.where(K.f_err > 0, True, False)
+            isFlagOk__lz = np.where(K.f_flag == 0, 1, 0)
+            isErrOk__lz = np.where(K.f_err > 0, 1, 0)
             
             isWeiOk__lz = 0 * isFlagOk__lz + 1     
             
             # if input-given excludeWei0 is True than f_wei = 0 points are excluded form the stats
             # otherwise, em-lines and other masked lambdas (including the blue egde) DO enter the stats! 
             if excludeWei0:                         
-                isWeiOk__lz = np.where(K.f_wei > 0, True, False)
+                isWeiOk__lz = np.where(K.f_wei > 0, 1, 0)
             
             isOk__lz = isFlagOk__lz * isWeiOk__lz * isErrOk__lz
             
@@ -200,6 +169,7 @@ if __name__ == '__main__':
             RF_SumMtot0__l += (RF_Mtot0__lz * isOkAndInRad__lz).sum(axis = 1)
             # rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
     
+            # 
             OF_l_obs = K.l_obs * (1. + K.header['REDSHIFT'])
         
             # ATT: The ugly explicit loop in z is because that's how I know how to use np.interp!
@@ -233,6 +203,9 @@ if __name__ == '__main__':
                 OF_SumMtotS__o += (OF_MtotS__o * OF_isOkAndInRad__o)
                 OF_SumMtot0__o += (OF_Mtot0__o * OF_isOkAndInRad__o)
             #oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+            
+            K.close()
+
         #===============================================================================================
         # REST-FRAME Final stats: ave & sig's of R, S & U
         RF_aveR__l = np.where(RF_NOk__l >= 1, RF_SumR__l / (RF_NOk__l + 1.e-100), 0)
