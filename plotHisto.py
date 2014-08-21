@@ -47,11 +47,12 @@ def plotFitHisto(binCenter, histo, title, fileName, fit = False):
 
     f.tight_layout()
     f.savefig(fileName)
+    plt.close(f)
 
 if __name__ == '__main__':
     for wei in ['w0', 'w1']:
         for rad in ['Galaxy', 'Nucleus', 'Bulge', 'Disc']:
-            fileName = 'SpecResidStats4DR2_HistsRSU.%s.%s.csv' % (wei, rad)
+            fileName = 'SpecResidStats4DR2_HistsRSU.%s.%s' % (wei, rad)
             binCenter, histoR, histoS, histoU = np.loadtxt(fileName, unpack = True)
             #fit = True
             plotFitHisto(binCenter, histoR, rad, 'histoR-%s-%s.png' % (wei, rad), fit = fit)
