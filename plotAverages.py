@@ -14,8 +14,8 @@ mpl.rcParams['xtick.labelsize'] = 13
 mpl.rcParams['ytick.labelsize'] = 13 
 mpl.rcParams['font.family']     = 'sans-serif'
 
-#versionSuffix = 'v20_q036.d13c'
-versionSuffix = 'v20_q043.d14a'
+versionSuffix = 'v20_q036.d13c'
+#versionSuffix = 'v20_q043.d14a'
 radCode = ['Galaxy', 'Nucleus', 'Bulge', 'Disc']
 radColor = dict(Galaxy = 'k', Nucleus = 'r', Bulge = 'y', Disc = 'b')
 llow = 3800 
@@ -59,7 +59,7 @@ def plotRAx(ax, data):
         ax.plot(x[m], y[m], color = color, label = rad, lw = 1.5)
     
     ax.set_ylabel(r'$\langle R_\lambda \rangle$')
-    fixLocatorsAx(ax, 'both')
+    fixLocatorsAx(ax, 'lower')
     plt.setp(ax.get_xticklabels(), visible = False)        
     
 def plotUAx(ax, data):
@@ -74,7 +74,7 @@ def plotUAx(ax, data):
         ax.plot(x[m], y[m], color = color, label = rad, lw = 1.5)
     
     ax.set_ylabel(r'$\langle U_\lambda \rangle$')
-    fixLocatorsAx(ax, 'both')
+    fixLocatorsAx(ax, 'lower')
     plt.setp(ax.get_xticklabels(), visible = False)        
 
 def plotSigmaRAx(ax, data):
@@ -89,7 +89,7 @@ def plotSigmaRAx(ax, data):
         ax.plot(x[m], y[m], color = color, label = rad, lw = 1.5) 
     
     ax.set_ylabel(r'$\sigma(R_\lambda)$')
-    fixLocatorsAx(ax, 'both')
+    fixLocatorsAx(ax, 'lower')
     plt.setp(ax.get_xticklabels(), visible = False)        
 
 def plotSigmaUAx(ax, data):
@@ -104,7 +104,7 @@ def plotSigmaUAx(ax, data):
         ax.plot(x[m], y[m], color = color, label = rad, lw = 1.5) 
     
     ax.set_ylabel(r'$\sigma(U_\lambda)$')
-    fixLocatorsAx(ax, 'both')
+    fixLocatorsAx(ax, 'lower')
     plt.setp(ax.get_xticklabels(), visible = False)        
 
 def plotNRatioAx(ax, data):
@@ -118,7 +118,7 @@ def plotNRatioAx(ax, data):
     
     ax.set_ylabel(r'$N^{Ok}_\lambda / N_{tot}$')
     ax.set_xlabel(r'wavelength')
-    fixLocatorsAx(ax, 'upper')
+    fixLocatorsAx(ax, None)
 
 def getAttribFromData(data, rad, attrib):
     radDict = dict(Galaxy = 0, Nucleus = 1, Bulge = 2, Disc = 3)
