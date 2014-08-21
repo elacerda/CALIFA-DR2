@@ -1,19 +1,25 @@
 #!/usr/bin/python
 import numpy as np
 from pycasso import fitsQ3DataCube
-from pystarlight.util.constants import c
+import os
 
 debug = False
 #debug = True
+excludeWei0 = True
 
 CALIFAWorkDir = '/Users/lacerda/CALIFA/'
     
 #galaxiesListFile    = CALIFAWorkDir + 'listOf300GalPrefixes.txt'
 galaxiesListFile = CALIFAWorkDir + 'listDR2.txt'
 
-baseCode = 'Bgsd6e'
-versionSuffix = 'v20_q043.d14a'
-SuperFitsDir = '/Volumes/backupzeira/CALIFA/q043/v20/' + baseCode + '/'
+#baseCode = 'Bgsd6e'
+baseCode = 'Bgsd61'
+#versionSuffix = 'v20_q043.d14a'
+versionSuffix = 'v20_q036.d13c'
+#othSuffix = '512.ps03.k1.mE.CCM.'
+othSuffix = '512.ps03.k2.mC.CCM.'
+#SuperFitsDir = '/Volumes/backupzeira/CALIFA/q043/v20/' + baseCode + '/'
+SuperFitsDir = '/Volumes/backupzeira/CALIFA/q036/v20/' + baseCode + '/'
 imgDir = CALIFAWorkDir + 'images/'
 
 f = open(galaxiesListFile, 'r')
@@ -25,6 +31,7 @@ if debug:
     #listOfPrefixes = ['K0026\n']
     
 N_gals = len(listOfPrefixes)
+print N_gals
 
 #EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 #EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
@@ -34,8 +41,6 @@ if __name__ == '__main__':
     l_int = np.arange(3650, 7200, 2)
     Nl_int = len(l_int)
     Nl_obs = 1601
-
-    excludeWei0 = False
     N_spectra = 0
     N_pixels = 0
     
@@ -90,12 +95,19 @@ if __name__ == '__main__':
         histR = np.zeros((Nres_bins))     
         histS = np.zeros((Nres_bins))     
         histU = np.zeros((Nres_bins))
+        
+        Ng = N_gals
 
         for iGal in np.arange(N_gals):
             galName = listOfPrefixes[iGal][:-1]
             
-            CALIFASuffix = '_synthesis_eBR_' + versionSuffix + '512.ps03.k1.mE.CCM.' + baseCode + '.fits'
+            CALIFASuffix = '_synthesis_eBR_' + versionSuffix + othSuffix + baseCode + '.fits'
             CALIFAFitsFile = SuperFitsDir + galName + CALIFASuffix
+            
+            if not os.path.exists(CALIFAFitsFile):
+                print '%s: file not found' % CALIFAFitsFile
+                Ng = Ng - 1
+                continue
             
             K = fitsQ3DataCube(CALIFAFitsFile)
     
@@ -269,7 +281,7 @@ if __name__ == '__main__':
             'OF_sigS__o' : OF_sigS__o,
             'OF_aveU__o' : OF_aveU__o,
             'OF_sigU__o' : OF_sigU__o,
-            'N_gals': N_gals,
+            'N_gals': Ng,
             'N_spectra' : N_spectra,
             'N_pixels' : N_pixels,
             'res_bin_cen' : res_bin_cen,
@@ -285,16 +297,16 @@ if __name__ == '__main__':
             'RF_aveMtotR__l' : RF_aveMtotR__l,
             'RF_aveMtotS__l':RF_aveMtotS__l,
             'RF_aveMtot0__l' : RF_aveMtot0__l,
-            'OF_aveMtotR__o':OF_aveMtotR__o,
-            'OF_aveMtotS__o':OF_aveMtotS__o,
-            'OF_aveMtot0__o':OF_aveMtot0__o,
+            'OF_aveMtotR__o' : OF_aveMtotR__o,
+            'OF_aveMtotS__o' : OF_aveMtotS__o,
+            'OF_aveMtot0__o' : OF_aveMtot0__o,
         }
     
         suf = excludeWei0Code + '.' + radCode[iRad]
         D = dicResidStats
         
-        fname1 = 'SpecResidStatsDR2_RestFrame.' + suf + '.csv'
-        fname2 = 'SpecResidStatsDR2_ObsFrame.' + suf + '.csv'
+        fname1 = 'SpecResidStats4DR2_RestFrame.' + suf
+        fname2 = 'SpecResidStats4DR2_ObsFrame.' + suf
         f1 = open(fname1, 'w')
         f2 = open(fname2, 'w')
         tabHeader = '# lambda   N   aveR         sigR         aveS         sigS         aveU         sigU    aveOtotR  aveOtotS  aveOtot0  aveMtotR  aveMtotS  aveMtot0\n'
@@ -319,7 +331,7 @@ if __name__ == '__main__':
         f2.close()
     
         # R, S & U histograms
-        fname3 = 'SpecResidStats4DR2_HistsRSU.' + suf + '.csv'
+        fname3 = 'SpecResidStats4DR2_HistsRSU.' + suf
         f3 = open(fname3, 'w')
         tabHeader = '# res_bin_cen histR        histS        histU \n'
         f3.write(tabHeader)
