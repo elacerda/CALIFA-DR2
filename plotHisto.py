@@ -9,6 +9,8 @@ from matplotlib import pyplot as plt
 from astropy.modeling import models, fitting
 
 mpl.rcParams['font.family'] = 'sans-serif'
+#versionSuffix = 'v20_q036.d13c'
+versionSuffix = 'v20_q043.d14a'
 
 fit = False
 #fit = True
@@ -54,7 +56,6 @@ if __name__ == '__main__':
         for rad in ['Galaxy', 'Nucleus', 'Bulge', 'Disc']:
             fileName = 'SpecResidStats4DR2_HistsRSU.%s.%s' % (wei, rad)
             binCenter, histoR, histoS, histoU = np.loadtxt(fileName, unpack = True)
-            #fit = True
-            plotFitHisto(binCenter, histoR, rad, 'histoR-%s-%s.png' % (wei, rad), fit = fit)
-            plotFitHisto(binCenter, histoS, rad, 'histoS-%s-%s.png' % (wei, rad), fit = fit)
-            plotFitHisto(binCenter, histoU, rad, 'histoU-%s-%s.png' % (wei, rad), fit = fit)
+            plotFitHisto(binCenter, histoR, '%s %s' % (rad, versionSuffix), 'histoR.%s,%s.%s.png' % (versionSuffix, wei, rad), fit = fit)
+            plotFitHisto(binCenter, histoS, '%s %s' % (rad, versionSuffix), 'histoS.%s.%s.%s.png' % (versionSuffix, wei, rad), fit = fit)
+            plotFitHisto(binCenter, histoU, '%s %s' % (rad, versionSuffix), 'histoU.%s.%s.%s.png' % (versionSuffix, wei, rad), fit = fit)
