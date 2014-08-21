@@ -309,7 +309,7 @@ if __name__ == '__main__':
         fname2 = 'SpecResidStats4DR2_ObsFrame.' + suf
         f1 = open(fname1, 'w')
         f2 = open(fname2, 'w')
-        tabHeader = '# lambda   N   aveR         sigR         aveS         sigS         aveU         sigU    aveOtotR  aveOtotS  aveOtot0  aveMtotR  aveMtotS  aveMtot0\n'
+        tabHeader = '# lambda   N   aveR         sigR         aveS         sigS         aveU         sigU         aveOtotR  aveOtotS  aveOtot0  aveMtotR  aveMtotS  aveMtot0\n'
         f1.write(tabHeader)
         f2.write(tabHeader)
         fmt = '%4i    %4i   ' + 12 * '%.5e  ' + ' \n'
