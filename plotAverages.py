@@ -14,8 +14,9 @@ mpl.rcParams['xtick.labelsize'] = 13
 mpl.rcParams['ytick.labelsize'] = 13 
 mpl.rcParams['font.family']     = 'sans-serif'
 
-versionSuffix = 'v20_q036.d13c'
-#versionSuffix = 'v20_q043.d14a'
+outputImgSuffix = 'pdf'
+#versionSuffix = 'v20_q036.d13c'
+versionSuffix = 'v20_q043.d14a'
 radCode = ['Galaxy', 'Nucleus', 'Bulge', 'Disc']
 radColor = dict(Galaxy = 'k', Nucleus = 'r', Bulge = 'y', Disc = 'b')
 llow = 3800 
@@ -114,9 +115,10 @@ def plotNRatioAx(ax, data):
         m = (x >= llow) & (x <= lup)
         y = getAttribFromData(data, rad, 'N')
         ax.set_xlim(3750, 6900)
-        ax.plot(x[m], y[m] / (y[m]).sum(), color = color, label = rad, lw = 1.5)
+        #ax.plot(x[m], y[m] / (y[m]).sum(), color = color, label = rad, lw = 1.5)
+        ax.plot(x[m], y[m], color = color, label = rad, lw = 1.5)
     
-    ax.set_ylabel(r'$N^{Ok}_\lambda / N_{tot}$')
+    ax.set_ylabel(r'$N^{Ok}_\lambda$')
     ax.set_xlabel(r'wavelength')
     fixLocatorsAx(ax, None)
 
@@ -163,6 +165,4 @@ if __name__ == '__main__':
             
             plt.setp(axArr[5].get_xticklabels(), visible = True)
             plt.setp([a.get_yticklabels() for a in f.axes], visible = True)
-            f.subplots_adjust(hspace = 0.001)
-            #f.tight_layout(h_pad = 0.001)
-            f.savefig('SpecResidStats.%s.%s.%s.png' % (versionSuffix, frame, wei))
+            f.savefig('SpecResidStats.%s.%s.%s.%s' % (versionSuffix, frame, wei, outputImgSuffix))
