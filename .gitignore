@@ -5,3 +5,7 @@
 oldScriptCid.py
 *.png
 v20*
+*.Bulge
+*.Disc
+*.Galaxy
+*.Nucleus

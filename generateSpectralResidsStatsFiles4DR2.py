@@ -12,14 +12,10 @@ CALIFAWorkDir = '/Users/lacerda/CALIFA/'
 #galaxiesListFile    = CALIFAWorkDir + 'listOf300GalPrefixes.txt'
 galaxiesListFile = CALIFAWorkDir + 'listDR2.txt'
 
-#baseCode = 'Bgsd6e'
-baseCode = 'Bgsd61'
-#versionSuffix = 'v20_q043.d14a'
-versionSuffix = 'v20_q036.d13c'
-#othSuffix = '512.ps03.k1.mE.CCM.'
-othSuffix = '512.ps03.k2.mC.CCM.'
-#SuperFitsDir = '/Volumes/backupzeira/CALIFA/q043/v20/' + baseCode + '/'
-SuperFitsDir = '/Volumes/backupzeira/CALIFA/q036/v20/' + baseCode + '/'
+versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'v20_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = CALIFAWorkDir + 'gal_fits/v20_q043.d14a/')
+#versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'v20_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = '/Volumes/backupzeira/CALIFA/q043/v20/Bgsd6e/')
+#versRun = dict(baseCode = 'Bgsd61', versionSuffix = 'v20_q036.d13c', othSuffix = '512.ps03.k2.mC.CCM.', SuperFitsDir = '/Volumes/backupzeira/CALIFA/q036/v20/Bgsd61/')
+
 imgDir = CALIFAWorkDir + 'images/'
 
 f = open(galaxiesListFile, 'r')
@@ -101,8 +97,8 @@ if __name__ == '__main__':
         for iGal in np.arange(N_gals):
             galName = listOfPrefixes[iGal][:-1]
             
-            CALIFASuffix = '_synthesis_eBR_' + versionSuffix + othSuffix + baseCode + '.fits'
-            CALIFAFitsFile = SuperFitsDir + galName + CALIFASuffix
+            CALIFASuffix = '_synthesis_eBR_' + versRun['versionSuffix'] + versRun['othSuffix'] + versRun['baseCode'] + '.fits'
+            CALIFAFitsFile = versRun['SuperFitsDir'] + galName + CALIFASuffix
             
             if not os.path.exists(CALIFAFitsFile):
                 print '%s: file not found' % CALIFAFitsFile
@@ -301,10 +297,10 @@ if __name__ == '__main__':
             'OF_aveMtotS__o' : OF_aveMtotS__o,
             'OF_aveMtot0__o' : OF_aveMtot0__o,
         }
-    
+                
         suf = excludeWei0Code + '.' + radCode[iRad]
         D = dicResidStats
-        
+
         fname1 = 'SpecResidStats4DR2_RestFrame.' + suf
         fname2 = 'SpecResidStats4DR2_ObsFrame.' + suf
         f1 = open(fname1, 'w')
@@ -313,14 +309,14 @@ if __name__ == '__main__':
         f1.write(tabHeader)
         f2.write(tabHeader)
         fmt = '%4i    %4i   ' + 12 * '%.5e  ' + ' \n'
-        for i in range(len(D['RF_lambda'])):
+        for i in range(K.Nl_obs):
             f1.write(fmt % (D['RF_lambda'][i], D['RF_NOk__l'][i], \
                              D['RF_aveR__l'][i], D['RF_sigR__l'][i], \
                              D['RF_aveS__l'][i], D['RF_sigS__l'][i], \
                              D['RF_aveU__l'][i], D['RF_sigU__l'][i], \
                              D['RF_aveOtotR__l'][i], D['RF_aveOtotS__l'][i], D['RF_aveOtot0__l'][i], \
-                             D['RF_aveMtotR__l'][i], D['RF_aveMtotS__l'][i], D['RF_aveMtot0__l'][i]))
-        for i in range(len(D['OF_lambda'])):
+                             D['RF_aveMtotR__l'][i], D['RF_aveMtotS__l'][i], D['RF_aveMtot0__l'][i]))            
+        for i in range(Nl_int):
             f2.write(fmt % (D['OF_lambda'][i], D['OF_NOk__o'][i], \
                              D['OF_aveR__o'][i], D['OF_sigR__o'][i], \
                              D['OF_aveS__o'][i], D['OF_sigS__o'][i], \
@@ -336,8 +332,9 @@ if __name__ == '__main__':
         tabHeader = '# res_bin_cen histR        histS        histU \n'
         f3.write(tabHeader)
         fmt = '%.5e  ' * 4 + ' \n'
-        for i in range(len(D['res_bin_cen'])):
-            f3.write(fmt % (D['res_bin_cen'][i], D['histR'][i], D['histS'][i], D['histU'][i]))
+        
+        for i in range(Nres_bins):
+            f3.write(fmt % (res_bin_cen[i], histR[i], histS[i], histU[i]))
         f3.close()
     
         # npz file with the full Dictionary
