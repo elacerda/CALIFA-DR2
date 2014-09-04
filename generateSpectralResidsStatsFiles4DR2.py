@@ -5,16 +5,19 @@ import os
 
 debug = False
 #debug = True
-excludeWei0 = True
+#excludeWei0 = True
+excludeWei0 = False
 
 CALIFAWorkDir = '/Users/lacerda/CALIFA/'
     
 #galaxiesListFile    = CALIFAWorkDir + 'listOf300GalPrefixes.txt'
 galaxiesListFile = CALIFAWorkDir + 'listDR2.txt'
 
-versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'v20_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = CALIFAWorkDir + 'gal_fits/v20_q043.d14a/')
+#versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'v20_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = CALIFAWorkDir + 'gal_fits/v20_q043.d14a/')
+versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'px1_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = CALIFAWorkDir + 'gal_fits/px1_q043.d14a/')
 #versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'v20_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = '/Volumes/backupzeira/CALIFA/q043/v20/Bgsd6e/')
 #versRun = dict(baseCode = 'Bgsd61', versionSuffix = 'v20_q036.d13c', othSuffix = '512.ps03.k2.mC.CCM.', SuperFitsDir = '/Volumes/backupzeira/CALIFA/q036/v20/Bgsd61/')
+#versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'px1_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = '/Volumes/backupzeira/CALIFA/q043/d14a/px1/')
 
 imgDir = CALIFAWorkDir + 'images/'
 
@@ -27,7 +30,7 @@ if debug:
     #listOfPrefixes = ['K0026\n']
     
 N_gals = len(listOfPrefixes)
-print N_gals
+print 'Initial list contains %d galaxies' % N_gals
 
 #EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 #EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
@@ -260,6 +263,8 @@ if __name__ == '__main__':
         del OF_SumOtotR__o, OF_SumOtotS__o, OF_SumOtot0__o
         #===============================================================================================
         
+        print 'Found: %d galaxies' % Ng
+        
         dicResidStats = {
             'RF_lambda' : K.l_obs,
             'RF_NOk__l' : RF_NOk__l,
@@ -305,7 +310,7 @@ if __name__ == '__main__':
         fname2 = 'SpecResidStats4DR2_ObsFrame.' + suf
         f1 = open(fname1, 'w')
         f2 = open(fname2, 'w')
-        tabHeader = '# lambda   N   aveR         sigR         aveS         sigS         aveU         sigU         aveOtotR  aveOtotS  aveOtot0  aveMtotR  aveMtotS  aveMtot0\n'
+        tabHeader = '# lambda   N   aveR         sigR         aveS         sigS         aveU         sigU         aveOtotR     aveOtotS     aveOtot0     aveMtotR     aveMtotS     aveMtot0\n'
         f1.write(tabHeader)
         f2.write(tabHeader)
         fmt = '%4i    %4i   ' + 12 * '%.5e  ' + ' \n'
