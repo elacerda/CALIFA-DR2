@@ -12,11 +12,15 @@ mpl.rcParams['axes.labelsize']  = 14
 mpl.rcParams['axes.titlesize']  = 26
 mpl.rcParams['xtick.labelsize'] = 13
 mpl.rcParams['ytick.labelsize'] = 13 
-mpl.rcParams['font.family']     = 'sans-serif'
+mpl.rcParams['font.family']     = 'serif'
+mpl.rcParams['font.serif']      = 'Times New Roman'
 
 outputImgSuffix = 'pdf'
 #versionSuffix = 'v20_q036.d13c'
-versionSuffix = 'v20_q043.d14a'
+#versionSuffix = 'v20_q043.d14a'
+versionSuffix = 'v20_q046.d15a'
+#versionSuffix = 'px1_q043.d14a'
+
 radCode = ['Galaxy', 'Nucleus', 'Bulge', 'Disc']
 radColor = dict(Galaxy = 'k', Nucleus = 'r', Bulge = 'y', Disc = 'b')
 llow = 3800 
@@ -113,23 +117,23 @@ def plotNRatioAx(ax, data):
         color = radColor[rad]
         x = getAttribFromData(data, rad, 'l')
         m = (x >= llow) & (x <= lup)
-        y = getAttribFromData(data, rad, 'N')
+        y = getAttribFromData(data, rad, 'N_Ntot')
         ax.set_xlim(3750, 6900)
         #ax.plot(x[m], y[m] / (y[m]).sum(), color = color, label = rad, lw = 1.5)
         ax.plot(x[m], y[m], color = color, label = rad, lw = 1.5)
     
-    ax.set_ylabel(r'$N^{Ok}_\lambda$')
+    ax.set_ylabel(r'$N^{Ok}_\lambda / N_{tot}$')
     ax.set_xlabel(r'wavelength')
     fixLocatorsAx(ax, None)
 
 def getAttribFromData(data, rad, attrib):
     radDict = dict(Galaxy = 0, Nucleus = 1, Bulge = 2, Disc = 3)
-    attribDict = dict(l = 0, N = 1, 
-                      aveR = 2, sigR = 3,
-                      aveS = 4, sigS = 5, 
-                      aveU = 6, sigU = 7,
-                      aveOtotR = 8, aveOtotS = 9, aveOtot0 = 10,
-                      aveMtotR = 11, aveMtotS = 12, aveMtot0 = 13)
+    attribDict = dict(l = 0, N = 1, N_Ntot = 2, 
+                      aveR = 3, sigR = 4,
+                      aveS = 5, sigS = 6, 
+                      aveU = 7, sigU = 8,
+                      aveOtotR = 9, aveOtotS = 10, aveOtot0 = 11,
+                      aveMtotR = 12, aveMtotS = 13, aveMtot0 = 14)
     iRad = radDict[rad]
     iAttrib = attribDict[attrib]
 

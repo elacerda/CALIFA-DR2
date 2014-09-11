@@ -5,21 +5,20 @@ import os
 
 debug = False
 #debug = True
-#excludeWei0 = True
-excludeWei0 = False
+excludeWei0 = True
+#excludeWei0 = False
 
 CALIFAWorkDir = '/Users/lacerda/CALIFA/'
     
 #galaxiesListFile    = CALIFAWorkDir + 'listOf300GalPrefixes.txt'
-galaxiesListFile = CALIFAWorkDir + 'listDR2.txt'
+galaxiesListFile = CALIFAWorkDir + 'list15.txt'
 
 #versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'v20_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = CALIFAWorkDir + 'gal_fits/v20_q043.d14a/')
-versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'px1_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = CALIFAWorkDir + 'gal_fits/px1_q043.d14a/')
+versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'v20_q046.d15a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = CALIFAWorkDir + 'gal_fits/v20_q046.d15a/')
+#versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'px1_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = CALIFAWorkDir + 'gal_fits/px1_q043.d14a/')
 #versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'v20_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = '/Volumes/backupzeira/CALIFA/q043/v20/Bgsd6e/')
 #versRun = dict(baseCode = 'Bgsd61', versionSuffix = 'v20_q036.d13c', othSuffix = '512.ps03.k2.mC.CCM.', SuperFitsDir = '/Volumes/backupzeira/CALIFA/q036/v20/Bgsd61/')
 #versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'px1_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = '/Volumes/backupzeira/CALIFA/q043/d14a/px1/')
-
-imgDir = CALIFAWorkDir + 'images/'
 
 f = open(galaxiesListFile, 'r')
 listOfPrefixes = f.readlines()
@@ -48,6 +47,12 @@ if __name__ == '__main__':
     if excludeWei0:
         excludeWei0Code = 'w0'
 
+    #EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+    # rad_low = np.array([   0.0 ])
+    # rad_upp = np.array([ 999.0 ])
+    # radCode = ['Galaxy']
+    #EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+
     rad_low = np.array([   0.0, 0.0, 0.0, 1.0 ])
     rad_upp = np.array([ 999.0, 0.01, 1.0, 999.0 ])
     radCode = ['Galaxy', 'Nucleus', 'Bulge', 'Disc']
@@ -61,6 +66,7 @@ if __name__ == '__main__':
         RF_SumU__l = np.ma.zeros((Nl_obs))
         RF_SumU2__l = np.ma.zeros((Nl_obs))
         RF_NOk__l = np.ma.zeros((Nl_obs))
+        RF_Ntot__l = np.ma.zeros((Nl_obs))
         OF_SumR__o = np.ma.zeros((Nl_int))
         OF_SumR2__o = np.ma.zeros((Nl_int))
         OF_SumS__o = np.ma.zeros((Nl_int))
@@ -131,7 +137,7 @@ if __name__ == '__main__':
             
             # Setup flag which filters zone in the irad radial bin and is Ok in lambda-space
             isOkAndInRad__lz = isOk__lz * isInRad__z
-        
+            
             # Define mean of Ok & em-line-free (continuum) fluxes for each zone. 
             # This gives an alternative normalization to fobs_norm, used in the definition of S__l
             avef_obs__z = (K.f_obs * isOk__lz).sum(axis = 0) / (isOk__lz.sum(axis = 0) + 1.e-100)
@@ -302,7 +308,7 @@ if __name__ == '__main__':
             'OF_aveMtotS__o' : OF_aveMtotS__o,
             'OF_aveMtot0__o' : OF_aveMtot0__o,
         }
-                
+        
         suf = excludeWei0Code + '.' + radCode[iRad]
         D = dicResidStats
 
@@ -310,19 +316,19 @@ if __name__ == '__main__':
         fname2 = 'SpecResidStats4DR2_ObsFrame.' + suf
         f1 = open(fname1, 'w')
         f2 = open(fname2, 'w')
-        tabHeader = '# lambda   N   aveR         sigR         aveS         sigS         aveU         sigU         aveOtotR     aveOtotS     aveOtot0     aveMtotR     aveMtotS     aveMtot0\n'
+        tabHeader = '# lambda   N    N/N_tot  aveR         sigR         aveS         sigS         aveU         sigU         aveOtotR     aveOtotS     aveOtot0     aveMtotR     aveMtotS     aveMtot0\n'
         f1.write(tabHeader)
         f2.write(tabHeader)
-        fmt = '%4i    %4i   ' + 12 * '%.5e  ' + ' \n'
+        fmt = '%4i    %4i    %.4f  ' + 12 * '%.5e  ' + ' \n'
         for i in range(K.Nl_obs):
-            f1.write(fmt % (D['RF_lambda'][i], D['RF_NOk__l'][i], \
+            f1.write(fmt % (D['RF_lambda'][i], D['RF_NOk__l'][i], D['RF_NOk__l'][i] / (1. * D['N_spectra']), \
                              D['RF_aveR__l'][i], D['RF_sigR__l'][i], \
                              D['RF_aveS__l'][i], D['RF_sigS__l'][i], \
                              D['RF_aveU__l'][i], D['RF_sigU__l'][i], \
                              D['RF_aveOtotR__l'][i], D['RF_aveOtotS__l'][i], D['RF_aveOtot0__l'][i], \
                              D['RF_aveMtotR__l'][i], D['RF_aveMtotS__l'][i], D['RF_aveMtot0__l'][i]))            
         for i in range(Nl_int):
-            f2.write(fmt % (D['OF_lambda'][i], D['OF_NOk__o'][i], \
+            f2.write(fmt % (D['OF_lambda'][i], D['OF_NOk__o'][i], D['OF_NOk__o'][i] / (1. * D['N_spectra']), \
                              D['OF_aveR__o'][i], D['OF_sigR__o'][i], \
                              D['OF_aveS__o'][i], D['OF_sigS__o'][i], \
                              D['OF_aveU__o'][i], D['OF_sigU__o'][i], \
