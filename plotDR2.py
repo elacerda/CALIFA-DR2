@@ -20,8 +20,8 @@ mpl.rcParams['font.serif']      = 'Times New Roman'
 
 outputImgSuffix = 'pdf'
 #versionSuffix = 'v20_q036.d13c'
-#versionSuffix = 'v20_q043.d14a'
-versionSuffix = 'v20_q046.d15a'
+versionSuffix = 'v20_q043.d14a'
+#versionSuffix = 'v20_q046.d15a'
 #versionSuffix = 'px1_q043.d14a'
 
 rad = 'Galaxy'
@@ -84,21 +84,25 @@ def plotNRatioAx(ax, data):
     ax.yaxis.set_major_locator(MultipleLocator(0.5))
     #fixLocatorsAx(ax)
 
-def getAttribFromData(data, wei, attrib):
-    weiDict = dict(w0 = 0, w1 = 1)
+def getAttribFromData(data, wei = None, attrib = None):
     attribDict = dict(l = 0, N = 1, N_Ntot = 2, 
                       aveR = 3, sigR = 4,
                       aveS = 5, sigS = 6, 
                       aveU = 7, sigU = 8,
                       aveOtotR = 9, aveOtotS = 10, aveOtot0 = 11,
                       aveMtotR = 12, aveMtotS = 13, aveMtot0 = 14)
-    iWei = weiDict[wei]
+    if wei:
+        weiDict = dict(w0 = 0, w1 = 1)
+        iWei = weiDict[wei]
+        
     iAttrib = attribDict[attrib]
 
     if type(data) is np.ndarray:
         return data[iAttrib]
-    else:
+    elif type(data) is not np.ndarray and wei:
         return data[iWei][iAttrib] 
+    else: 
+        return None
     
 if __name__ == '__main__':
     data = []

@@ -12,21 +12,26 @@ mpl.rcParams['font.family']     = 'serif'
 mpl.rcParams['font.serif']      = 'Times New Roman'
 
 outputImgSuffix = 'pdf'
-def getAttribFromData(data, wei, attrib):
-    weiDict = dict(w0 = 0, w1 = 1)
+
+def getAttribFromData(data, wei = None, attrib = None):
     attribDict = dict(l = 0, N = 1, N_Ntot = 2, 
                       aveR = 3, sigR = 4,
                       aveS = 5, sigS = 6, 
                       aveU = 7, sigU = 8,
                       aveOtotR = 9, aveOtotS = 10, aveOtot0 = 11,
                       aveMtotR = 12, aveMtotS = 13, aveMtot0 = 14)
-    iWei = weiDict[wei]
+    if wei:
+        weiDict = dict(w0 = 0, w1 = 1)
+        iWei = weiDict[wei]
+        
     iAttrib = attribDict[attrib]
 
     if type(data) is np.ndarray:
         return data[iAttrib]
-    else:
+    elif type(data) is not np.ndarray and wei:
         return data[iWei][iAttrib] 
+    else: 
+        return None
 
 data_v14 = np.loadtxt('v20_q043.d14a_185gal/SpecResidStats4DR2_RestFrame.w0.Galaxy', unpack = True)
 data_v15 = np.loadtxt('v20_q046.d15a/SpecResidStats4DR2_RestFrame.w0.Galaxy', unpack = True)
@@ -35,14 +40,14 @@ llow = 3700
 lup = 6850
 
 # X and Y
-x = getAttribFromData(data_v14, 'w0', 'l')
-y_v14 = getAttribFromData(data_v14, 'w0', 'aveR')
-y_v15 = getAttribFromData(data_v15, 'w0', 'aveR')
+x = getAttribFromData(data_v14, attrib = 'l')
+y_v14 = getAttribFromData(data_v14, attrib = 'aveR')
+y_v15 = getAttribFromData(data_v15, attrib = 'aveR')
 
 # masks
 m = (x >= llow) & (x <= lup)
-N_v14 = getAttribFromData(data_v14, 'w0', 'N')
-N_v15 = getAttribFromData(data_v15, 'w0', 'N')
+N_v14 = getAttribFromData(data_v14, attrib = 'N')
+N_v15 = getAttribFromData(data_v15, attrib = 'N')
 yv14 = np.ma.masked_array(y_v14, mask = (N_v14 == 0))
 yv15 = np.ma.masked_array(y_v15, mask = (N_v15 == 0))
 

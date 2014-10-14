@@ -17,8 +17,8 @@ mpl.rcParams['font.serif']      = 'Times New Roman'
 
 outputImgSuffix = 'pdf'
 #versionSuffix = 'v20_q036.d13c'
-#versionSuffix = 'v20_q043.d14a'
-versionSuffix = 'v20_q046.d15a'
+versionSuffix = 'v20_q043.d14a'
+#versionSuffix = 'v20_q046.d15a'
 #versionSuffix = 'px1_q043.d14a'
 
 radCode = ['Galaxy', 'Nucleus', 'Bulge', 'Disc']

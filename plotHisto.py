@@ -11,8 +11,8 @@ from scipy.optimize import curve_fit
 mpl.rcParams['font.family']     = 'serif'
 mpl.rcParams['font.serif']      = 'Times New Roman'
 #versionSuffix = 'v20_q036.d13c'
-#versionSuffix = 'v20_q043.d14a'
-versionSuffix = 'v20_q046.d15a'
+versionSuffix = 'v20_q043.d14a'
+#versionSuffix = 'v20_q046.d15a'
 #versionSuffix = 'px1_q043.d14a'
 outputImgSuffix = 'pdf'
 
