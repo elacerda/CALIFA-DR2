@@ -5,6 +5,9 @@ import numpy as np
 import matplotlib as mpl
 from pycasso import fitsQ3DataCube
 from matplotlib import pyplot as plt
+from CALIFAUtils import paths 
+from CALIFAUtils.scripts import sort_gals
+from CALIFAUtils.scripts import loop_cubes
 
 # All this part before the function definitions are just to format the plot and to
 # configure which version of CALIFA is used to do the plot (basically to retrieve
@@ -19,37 +22,34 @@ mpl.rcParams['font.serif']      = 'Times New Roman'
 outputImgSuffix = 'png'
 debug = False
 #debug = True
+v_run = -1
 
-CALIFAWorkDir = '/Users/lacerda/CALIFA/'
-galaxiesListFile = CALIFAWorkDir + 'list15.txt'
-DRVersion = 'DR2'
+CALIFAWorkDir = paths.califa_work_dir
+#galaxiesListFile = CALIFAWorkDir + 'list15.txt'
+galaxiesListFile = CALIFAWorkDir + 'listv20_q050.d15a.txt'
+#galaxiesListFile = CALIFAWorkDir + 'listDR2.txt'
+#DRVersion = 'q046'
+DRVersion = 'DR3'
+versionSuffix = 'v20_q053.d22a512.mE'
 
-versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'v20_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = CALIFAWorkDir + 'gal_fits/v20_q043.d14a/')
-#versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'v20_q046.d15a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = CALIFAWorkDir + 'gal_fits/v20_q046.d15a/')
-#versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'px1_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = CALIFAWorkDir + 'gal_fits/px1_q043.d14a/')
-#versRun = dict(baseCode = 'Bgsd61', versionSuffix = 'v20_q036.d13c', othSuffix = '512.ps03.k2.mC.CCM.', SuperFitsDir = CALIFAWorkDir + 'gal_fits/v20_q036.d13c/')
-#versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'v20_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = '/Volumes/backupzeira/CALIFA/q043/v20/Bgsd6e/')
-#versRun = dict(baseCode = 'Bgsd61', versionSuffix = 'v20_q036.d13c', othSuffix = '512.ps03.k2.mC.CCM.', SuperFitsDir = '/Volumes/backupzeira/CALIFA/q036/v20/Bgsd61/')
-#versRun = dict(baseCode = 'Bgsd6e', versionSuffix = 'px1_q043.d14a', othSuffix = '512.ps03.k1.mE.CCM.', SuperFitsDir = '/Volumes/backupzeira/CALIFA/q043/d14a/px1/')
+paths.set_v_run(v_run)
 
 imgDir = CALIFAWorkDir + 'images/'
 
-f = open(galaxiesListFile, 'r')
-listOfPrefixes = f.readlines()
-f.close()
-
+gals, _ = sort_gals(galaxiesListFile)
+N_gals = len(gals)
+maxGals = None
 if debug:
-    listOfPrefixes = listOfPrefixes[0:20]        # Q&D tests ...
-    #listOfPrefixes = ['K0026\n']
-    
-N_gals = len(listOfPrefixes)
+    maxGals = 10
+    if N_gals > maxGals:
+        N_gals = maxGals
 
 def CALIFAResidualSpectraStack(x_ini, x_fin, dx, x_label, y_ini, y_fin, dy, y_label, z, z_label, fileName):
     y, x = np.mgrid[slice(y_ini, y_fin + dy, dy),
                     slice(x_ini, x_fin + dx, dx)]
     f = plt.figure()
     f.set_size_inches(10, 4)
-    plt.pcolormesh(x, y, z, cmap = plt.get_cmap('gray'), vmax = 10, vmin = -10)
+    plt.pcolormesh(x, y, z, cmap = mpl.cm.Blues_r, vmax = 10, vmin = -10)
     cb = plt.colorbar()
     plt.axis([x_ini, x_fin, y_ini, y_fin])
     plt.xlabel(x_label)
@@ -65,19 +65,20 @@ if __name__ == '__main__':
     f_res_perc = np.ndarray((N_gals, 1601))
     f_res_norm_perc = np.ndarray((N_gals, 1601))
     N_zones = 0 
+    N_zonesOk = 0 
     N_zone1pix = 0  
+    zonesOk = np.ones((N_gals), dtype = np.bool)
 
-    for iGal in np.arange(N_gals):
-        galName = listOfPrefixes[iGal][:-1]
-        
-        CALIFASuffix = '_synthesis_eBR_' + versRun['versionSuffix'] + versRun['othSuffix'] + versRun['baseCode'] + '.fits'
-        CALIFAFitsFile = versRun['SuperFitsDir'] + galName + CALIFASuffix
-        
-        K = fitsQ3DataCube(CALIFAFitsFile)
-        
+    for iGal, K in loop_cubes(gals.tolist(), imax = maxGals, v_run = v_run):
+        if K is None or gals[iGal] == 'K0847':
+            print '<<< miss file:', gals[iGal]
+            zonesOk[iGal] = False
+            continue
+        zonesOk = K.filterResidual(w2=4600)
+        N_zonesOk += np.asarray(zonesOk, dtype = int).sum()
         N_zones += K.N_zone
         N_zone1pix += np.where(K.zoneArea_pix == 1, 1, 0).sum()
-        print K.califaID, K.N_zone, N_zones, np.where(K.zoneArea_pix == 1, 1, 0).sum(), N_zone1pix
+        print K.califaID, K.N_zone, zonesOk.sum(), N_zones, np.where(K.zoneArea_pix == 1, 1, 0).sum(), N_zone1pix
         
         redshift['gal'][iGal] = K.califaID
         redshift['z'][iGal] = K.redshift
@@ -87,11 +88,11 @@ if __name__ == '__main__':
         f_res_norm_perc[iGal, :] = ((K.f_obs[:, 0] - K.f_syn[:, 0]) / K.fobs_norm[0]) * 100
         
     # Align the spectra by redshift
-    S = np.argsort(redshift['z'])
-    f_res_perc_sorted = f_res_perc[S, :]
-    f_res_norm_perc_sorted = f_res_norm_perc[S, :]
+    S = np.argsort(redshift['z'][zonesOk])
+    f_res_perc_sorted = f_res_perc[zonesOk][S, :]
+    f_res_norm_perc_sorted = f_res_norm_perc[zonesOk][S, :]
     
-    print " TOTAL: %d %d" % (N_zones, N_zone1pix)
+    print " TOTAL: %d %d %d" % (N_zones, N_zone1pix, N_zonesOk)
     
     #Stack spectra
     CALIFAResidualSpectraStack(x_ini = K.l_obs[0], x_fin = K.l_obs[-1], dx = 2., x_label = r'rest-frame wavelength $[\AA]$',  

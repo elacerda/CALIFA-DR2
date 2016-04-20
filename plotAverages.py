@@ -6,6 +6,8 @@ import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MultipleLocator, MaxNLocator
+from CALIFAUtils import paths
+from CALIFAUtils.plots import add_subplot_axes
 
 mpl.rcParams['font.size']       = 14
 mpl.rcParams['axes.labelsize']  = 14
@@ -16,12 +18,13 @@ mpl.rcParams['font.family']     = 'serif'
 mpl.rcParams['font.serif']      = 'Times New Roman'
 
 outputImgSuffix = 'pdf'
-#versionSuffix = 'v20_q036.d13c'
-versionSuffix = 'v20_q043.d14a'
-#versionSuffix = 'v20_q046.d15a'
-#versionSuffix = 'px1_q043.d14a'
+
+paths.set_v_run(0)
+#versionSuffix = paths.get_config()['versionSuffix']
+versionSuffix = 'v20_q053.d22a512.mE' 
 
 radCode = ['Galaxy', 'Nucleus', 'Bulge', 'Disc']
+#radCode = ['Galaxy']
 radColor = dict(Galaxy = 'k', Nucleus = 'r', Bulge = 'y', Disc = 'b')
 llow = 3800 
 lup = 7200
@@ -83,6 +86,7 @@ def plotUAx(ax, data):
     plt.setp(ax.get_xticklabels(), visible = False)        
 
 def plotSigmaRAx(ax, data):
+    #subax = add_subplot_axes(ax, [0.65,  0.25, 0.30, 0.65])
     for rad in radCode:
         color = radColor[rad]
         x = getAttribFromData(data, rad, 'l')
@@ -90,9 +94,21 @@ def plotSigmaRAx(ax, data):
         sigR = getAttribFromData(data, rad, 'sigR')
         N = getAttribFromData(data, rad, 'N')
         y = np.ma.masked_array(sigR, mask = (N == 0))
+        #ax.set_ylim(0, 0.14)
         ax.set_xlim(3750, 6900)
-        ax.plot(x[m], y[m], color = color, label = rad, lw = 1.5) 
-    
+        ax.plot(x[m], y[m], color = color, label = rad, lw = 1.5)
+#EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+#         subax.plot(x[m], y[m], color = color, label = rad, lw = 1.5)
+#     subax.set_ylim(0, 0.14)
+#     subax.set_xlim(3750, 4600)
+#     subax.xaxis.set_major_locator(MultipleLocator(500))
+#     subax.xaxis.set_minor_locator(MultipleLocator(100))
+#     subax.yaxis.set_major_locator(MaxNLocator(7, prune = 'lower'))
+#     subax.xaxis.grid(which = 'minor')
+#     subax.yaxis.grid()
+#     plt.setp(subax.get_xticklabels(), visible = True)
+#     subax.tick_params(axis='both', which='major', labelsize=10)
+#EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
     ax.set_ylabel(r'$\sigma(R_\lambda)$')
     fixLocatorsAx(ax, 'lower')
     plt.setp(ax.get_xticklabels(), visible = False)        
@@ -148,11 +164,13 @@ def getAttribFromData(data, rad, attrib):
     
 if __name__ == '__main__':
     for frame in [ 'ObsFrame', 'RestFrame' ]:
-        for wei in ['w0', 'w1']:
+    #for frame in [ 'RestFrame' ]:
+        #for wei in ['w0', 'w1']:
+        for wei in ['w0']:
             data = []
             
-            for rad in ['Galaxy', 'Nucleus', 'Bulge', 'Disc']:
-                fileName = 'SpecResidStats4DR2_%s.%s.%s' % (frame, wei, rad)
+            for rad in radCode:
+                fileName = 'SpecResidStats4DR3_%s.%s.%s' % (frame, wei, rad)
                 aux = np.loadtxt(fileName, unpack = True)
                 data.append(aux)
                 

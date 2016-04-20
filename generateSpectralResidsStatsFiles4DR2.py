@@ -1,5 +1,6 @@
 #!/usr/bin/python
-from CALIFAUtils.scripts import loop_cubes
+from pycasso import fitsQ3DataCube
+#from CALIFAUtils.scripts import loop_cubes
 from CALIFAUtils.scripts import sort_gals 
 from CALIFAUtils import paths
 from CALIFAUtils import debug_var
@@ -52,28 +53,28 @@ def parser_args():
 
     return parser.parse_args()
 
-args = parser_args()
-debug = args.debug
-debug_var(debug, args = args.__dict__)
-excludeWei0 = args.excludeWei0
-v_run = args.vrun
-if args.vrunstr is not None:
-    v_run = args.vrunstr
-paths.set_v_run(v_run)
-CALIFAWorkDir = paths.califa_work_dir
-galaxiesListFile = args.listgal
-
-gals, _ = sort_gals(galaxiesListFile)
-N_gals = len(gals)
-maxGals = args.maxGals
-if debug:
-    maxGals = 10
-    if N_gals > maxGals:
-        N_gals = maxGals
-
-print 'Initial list contains %d galaxies' % N_gals
-
 if __name__ == '__main__':
+    args = parser_args()
+    debug = args.debug
+    debug_var(debug, args = args.__dict__)
+    excludeWei0 = args.excludeWei0
+    v_run = args.vrun
+    if args.vrunstr is not None:
+        v_run = args.vrunstr
+    paths.set_v_run(v_run)
+    CALIFAWorkDir = paths.califa_work_dir
+    galaxiesListFile = args.listgal
+    
+    gals, _ = sort_gals(galaxiesListFile)
+    N_gals = len(gals)
+    maxGals = args.maxGals
+    if debug:
+        maxGals = 10
+        if N_gals > maxGals:
+            N_gals = maxGals
+    
+    print 'Initial list contains %d galaxies' % N_gals
+    
     l_int = np.arange(3650, 7200, 2)
     Nl_int = len(l_int)
     Nl_obs = 1601
@@ -144,7 +145,10 @@ if __name__ == '__main__':
         
         Ng = N_gals
 
-        for iGal, K in loop_cubes(gals.tolist(), imax = maxGals, v_run = v_run):
+        for iGal, gal in enumerate(gals):
+        #for iGal, K in loop_cubes(gals.tolist(), imax = maxGals, v_run = v_run):
+            f_gal = '/data/CALIFA/legacy/q053/superfits/Bgsd6e/' + gal + '_synthesis_eBR_v20_q053.d22a512.ps03.k1.mE.CCM.Bgsd6e.fits'
+            K = fitsQ3DataCube(f_gal)
             if K is None:
                 print '%s: file not found' % paths.get_pycasso_file(gals[iGal])
                 Ng = Ng - 1
