@@ -1,12 +1,42 @@
 #!/usr/bin/python
 from pycasso import fitsQ3DataCube
-#from CALIFAUtils.scripts import loop_cubes
-from CALIFAUtils.scripts import sort_gals 
-from CALIFAUtils import paths
-from CALIFAUtils import debug_var
 import argparse as ap
 import numpy as np
 import sys 
+
+def sort_gals(gals, func = None, order = 0, **kwargs):
+    '''
+    Sort galaxies inside GALS in ORDER order.
+    
+    GALS can be a list or a string with a text file direction. 
+        
+    ORDER
+    > 0 - sort desc
+      0 - no sort
+    < 0 - sort asc
+    '''
+    verbose = kwargs.get('verbose', None)
+    if isinstance(gals, str):
+        fname = gals
+        f = open(fname, 'r')
+        g = []
+        for line in f.xreadlines():
+            l = line.strip()
+            if l[0] == '#':
+                continue
+            g.append(l)
+        f.close()
+        gals = np.unique(np.asarray(g))
+    elif isinstance(gals, list):
+        gals = np.unique(np.asarray(gals))
+    reverse = False
+    if order != 0:
+        if order < 0:
+            reverse = True
+        sgals = np.asarray(sorted(gals.tolist(), reverse = reverse))
+    else:
+        sgals = gals
+    return sgals
 
 def parser_args():        
     parser = ap.ArgumentParser(description = '%s' % sys.argv[0])
@@ -56,13 +86,11 @@ def parser_args():
 if __name__ == '__main__':
     args = parser_args()
     debug = args.debug
-    debug_var(debug, args = args.__dict__)
+    
     excludeWei0 = args.excludeWei0
     v_run = args.vrun
     if args.vrunstr is not None:
         v_run = args.vrunstr
-    paths.set_v_run(v_run)
-    CALIFAWorkDir = paths.califa_work_dir
     galaxiesListFile = args.listgal
     
     gals, _ = sort_gals(galaxiesListFile)
@@ -150,7 +178,7 @@ if __name__ == '__main__':
             f_gal = '/data/CALIFA/legacy/q053/superfits/Bgsd6e/' + gal + '_synthesis_eBR_v20_q053.d22a512.ps03.k1.mE.CCM.Bgsd6e.fits'
             K = fitsQ3DataCube(f_gal)
             if K is None:
-                print '%s: file not found' % paths.get_pycasso_file(gals[iGal])
+                print '%s: file not found' % f_gal
                 Ng = Ng - 1
                 continue
             # Setup is* 1/0 flags to select (zone,lambda) pixels which are Ok in different senses; isOk__lz wraps them all together
